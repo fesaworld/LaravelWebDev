@@ -6,6 +6,54 @@
         $('#createModal').modal('show');
     }
 
+    const deleteData = (id) => {
+        Swal.fire({
+            title: 'Apa anda yakin untuk menghapus barang haram ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, aing tobat',
+            cancelButtonText: 'Teu, gas maksiat'
+        }).then((result) => {
+            Swal.close();
+
+            if(result.value) {
+                Swal.fire({
+                    title: 'Mohon tunggu',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    willOpen: () => {
+                        Swal.showLoading()
+                    }
+                });
+
+                $.ajax({
+                    type: "delete",
+                    url: `/product/${id}`,
+                    dataType: "json",
+                    success: function (response) {
+                        Swal.close();
+
+                        if(response.status) {
+                            Swal.fire(
+                                'Success!',
+                                response.msg,
+                                'success'
+                            )
+
+                            $('#table').DataTable().ajax.reload();
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                response.msg,
+                                'warning'
+                            )
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     const edit = (id) => {
         Swal.fire({
             title: 'Mohon tunggu',
