@@ -40,6 +40,9 @@
           </div>
           <div class="card-body">
             <div class="table-responsive">
+                @can('create_product')
+                    <button type="button" class="my-3 btn btn-primary" onclick="create()">Tambah Produk</button>
+                @endcan
                 <table class="table table-hover table-striped table-border" id="table"
                 >
                 @if(Auth::user()->getRoleNames()[0] == 'User')
@@ -63,6 +66,7 @@
             </div>
           </div>
         </div>
+        @include('components.modals.product.create')
         <!-- /.card -->
 
       </section>
