@@ -1,7 +1,36 @@
 <script>
+    let product_id;
+
     const create = () => {
         $('#createForm').trigger('reset');
         $('#createModal').modal('show');
+    }
+
+    const edit = (id) => {
+        Swal.fire({
+            title: 'Mohon tunggu',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            willOpen: () => {
+                Swal.showLoading()
+            }
+        });
+
+        product_id = id;
+
+        $.ajax({
+            type: "get",
+            url: `/product/${product_id}`,
+            dataType: "json",
+            success: function (response) {
+                $('#name').val(response.name);
+                $('#product_category_id').val(response.product_category_id);
+                $('#price').val(response.price);
+
+                Swal.close();
+                $('#editModal').modal('show');
+            }
+        });
     }
 
     $(function () {
@@ -94,6 +123,51 @@
                         )
 
                         $('#createModal').modal('hide');
+                        $('#table').DataTable().ajax.reload();
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            data.msg,
+                            'warning'
+                        )
+                    }
+                }
+            })
+        });
+
+        $('#editSubmit').click(function (e) {
+            e.preventDefault();
+
+            var formData = $('#editForm').serialize();
+
+            Swal.fire({
+                title: 'Mohon tunggu',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                willOpen: () => {
+                    Swal.showLoading()
+                }
+            });
+
+            $.ajax({
+                type: "post",
+                url: `/product/${product_id}`,
+                data: formData,
+                dataType: "json",
+                cache: false,
+                processData: false,
+                success: function(data) {
+                    Swal.close();
+
+                    if(data.status) {
+                        Swal.fire(
+                            'Success!',
+                            data.msg,
+                            'success'
+                        )
+
+                        product_id = null;
+                        $('#editModal').modal('hide');
                         $('#table').DataTable().ajax.reload();
                     } else {
                         Swal.fire(

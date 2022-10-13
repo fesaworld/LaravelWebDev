@@ -24,7 +24,11 @@ class ProductController extends Controller
 
     public function show($id) {
         if(is_numeric($id)) {
+            $data = DB::table('products')->where('id', $id)->first();
 
+            $data->price = number_format($data->price);
+
+            return Response::json($data);
         }
 
         $data = DB::table('products')
@@ -85,6 +89,50 @@ class ProductController extends Controller
 
                 $json = [
                     'msg' => 'Produk berhasil ditambahkan',
+                    'status' => true
+                ];
+            } catch(Exception $e) {
+                $json = [
+                    'msg'       => 'error',
+                    'status'    => false,
+                    'e'         => $e
+                ];
+            }
+        }
+
+        return Response::json($json);
+    }
+
+    public function update(Request $request, $id)
+    {
+        if($request->name == NULL) {
+            $json = [
+                'msg'       => 'Mohon masukan nama produk',
+                'status'    => false
+            ];
+        } elseif(!$request->has('product_category_id')) {
+            $json = [
+                'msg'       => 'Mohon pilih kategori produk',
+                'status'    => false
+            ];
+        } elseif($request->price == NULL) {
+            $json = [
+                'msg'       => 'Mohon masukan harga produk',
+                'status'    => false
+            ];
+        } else {
+            try{
+                DB::transaction(function() use($request, $id) {
+                    DB::table('products')->where('id', $id)->update([
+                        'name' => $request->name,
+                        'product_category_id' => $request->product_category_id,
+                        'price' => str_replace(',','',$request->price),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+                });
+
+                $json = [
+                    'msg' => 'Produk berhasil disunting',
                     'status' => true
                 ];
             } catch(Exception $e) {

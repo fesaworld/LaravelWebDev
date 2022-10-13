@@ -67,6 +67,7 @@
           </div>
         </div>
         @include('components.modals.product.create')
+        @include('components.modals.product.edit')
         <!-- /.card -->
 
       </section>
